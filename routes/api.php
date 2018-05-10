@@ -1,6 +1,8 @@
 <?php
 
-use Illuminate\Http\Request;
+use Carbon\Carbon;
+use App\Http\Requests\ShortenRequest;
+use App\UrlAlias;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,6 +15,24 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
-});
+Route::post('/shorten', function (ShortenRequest $request) {
+    $expires_at = Carbon::now()->add(
+        DateInterval::createFromDateString(config('shortener.expiration_interval'))
+    );
+
+    // TODO: enhancement is to use HashIds to get more short urls
+    $alias = $request->filled('alias')
+        ? $request->alias
+        : base_convert($request->url . $expires_at->timestamp, 10, 36);
+
+    $url = UrlAlias::make([
+        'url'   => $request->url,
+        'alias' => $alias,
+    ]);
+
+    $url->expires_at = $expires_at;
+    $url->save();
+
+    // TODO: use Resource for transformation
+    return $url;
+})->name('api.shorten');

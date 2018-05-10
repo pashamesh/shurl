@@ -1,5 +1,7 @@
 <?php
 
+use App\UrlAlias;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -11,6 +13,22 @@
 |
 */
 
+Route::get('/{alias}', function ($alias) {
+    $url = UrlAlias::whereAlias($alias)->firstOrFail();
+
+    if ($url->expires_at->isPast())
+    {
+        $url->remove();
+        abort(410);
+    }
+
+    $url->increment('visits');
+
+    return redirect()->away(
+        (is_null(parse_url($url->url, PHP_URL_HOST)) ? '//' : '') . $url->url
+    );
+});
+
 Route::get('/', function () {
-    return view('welcome');
+    return view('index');
 });
