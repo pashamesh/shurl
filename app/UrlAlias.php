@@ -12,7 +12,7 @@ class UrlAlias extends Model
 
     protected $dates = ['expires_at', 'created_at', 'updated_at'];
 
-    protected $appends = ['full_alias'];
+    protected $appends = ['full_alias', 'statistics_url'];
 
     protected function serializeDate(\DateTimeInterface $date)
     {
@@ -22,5 +22,9 @@ class UrlAlias extends Model
     public function getFullAliasAttribute()
     {
         return url($this->alias);
+    }
+    public function getStatisticsUrlAttribute()
+    {
+        return route('stat', [$this->alias]);
     }
 }

@@ -29,6 +29,13 @@ Route::get('/{alias}', function ($alias) {
     );
 });
 
+
+Route::get('/stat/{alias}', function ($alias) {
+    $url = UrlAlias::whereAlias($alias)->firstOrFail();
+
+    return view('stat')->with('url', $url);
+})->name('stat');
+
 Route::get('/', function () {
     return view('index');
 });

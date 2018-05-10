@@ -61,7 +61,7 @@ require('./bootstrap');
             try {
                 if (document.execCommand('copy')) {
                     alert
-                        .addClass('alert-success')
+                        .addClass('alert-success').removeClass('alert-danger')
                         .html('Shortened url has been copied to the clipboard!')
                         .show();
 
@@ -73,7 +73,7 @@ require('./bootstrap');
             }
 
             alert
-                .addClass('alert-danger')
+                .addClass('alert-danger').removeClass('alert-success')
                 .html('Can\'t copy shortened url to the clipboard :(')
                 .show();
 
@@ -81,24 +81,30 @@ require('./bootstrap');
         }
 
         // TODO: set base url explicitly
-        $.post(
-            'api/v1/shorten',
-            {url: urlInput.val(), alias: aliasInput.val()},
-            (response) => {
-                // TODO: handle API errors
+        $.post('api/v1/shorten', {url: urlInput.val(), alias: aliasInput.val()})
+            .done(response => {
                 if (response.full_alias)
                 {
                     isSubmitted = true;
                     urlInput.attr('readonly', true).val(response.full_alias).select();
                     submit.text('Copy');
                     alert
-                        .addClass('alert-success')
+                        .addClass('alert-success').removeClass('alert-danger')
                         .html('Url "' + response.url + '" has been shortened!<br>' +
-                            'Now you can copy it.')
+                            'Now you can copy it.<br>' +
+                            'Url statatistics on <a href="' + response.statistics_url + '" target="_blank">' + response.statistics_url + '</a>'
+                        )
                         .show();
                 }
-            }
-        );
+            })
+            .fail(response => {
+                let messages = response.responseJSON.errors;
+
+                alert
+                    .addClass('alert-danger').removeClass('alert-success')
+                    .html(Object.values(messages).join('<br>'))
+                    .show();
+            });
 
         return false;
     });
