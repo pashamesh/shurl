@@ -3,13 +3,14 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
-use Carbon\Carbon;
 
 class UrlAlias extends Model
 {
     protected $fillable = ['url', 'alias'];
 
     protected $hidden = ['id', 'created_at', 'updated_at'];
+
+    protected $dates = ['expires_at', 'created_at', 'updated_at'];
 
     protected $appends = ['full_alias'];
 

@@ -18,8 +18,8 @@ Route::get('/{alias}', function ($alias) {
 
     if ($url->expires_at->isPast())
     {
-        $url->remove();
-        abort(410);
+        $url->delete();
+        abort(410, 'Shorten url is expired');
     }
 
     $url->increment('visits');
