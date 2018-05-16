@@ -33,6 +33,8 @@ Route::post('/shorten', function (ShortenRequest $request) {
     $url->expires_at = $expires_at;
     $url->save();
 
+    AuditLog::info('Shorten url created', ['url' => $url->toArray()]);
+
     // TODO: use Resource for transformation
     return $url;
 })->name('api.shorten');

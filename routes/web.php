@@ -24,6 +24,8 @@ Route::get('/{alias}', function ($alias) {
 
     $url->increment('visits');
 
+    AuditLog::info('Hit', ['url' => $url->toArray()]);
+
     return redirect()->away(
         (is_null(parse_url($url->url, PHP_URL_HOST)) ? '//' : '') . $url->url
     );
@@ -32,6 +34,8 @@ Route::get('/{alias}', function ($alias) {
 
 Route::get('/stat/{alias}', function ($alias) {
     $url = UrlAlias::whereAlias($alias)->firstOrFail();
+
+    AuditLog::info('View statistics', ['url' => $url->toArray()]);
 
     return view('stat')->with('url', $url);
 })->name('stat');
